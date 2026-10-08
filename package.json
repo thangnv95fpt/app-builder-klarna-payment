@@ -1,0 +1,46 @@
+{
+  "name": "@adobe/commerce-checkout-payment-method",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Out-of-process payment method validation and filtering for the Adobe Commerce checkout starter kit.",
+  "type": "module",
+  "imports": {
+    "#app.commerce.config": "./src/commerce-extensibility-1/.generated/app.commerce.config.js"
+  },
+  "scripts": {
+    "code:check": "npx biome check .",
+    "code:fix": "npx biome check --write .",
+    "postinstall": "npx aio-commerce-lib-app hooks postinstall",
+    "test": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@adobe/aio-commerce-lib-app": "^1.8.0",
+    "@adobe/aio-commerce-sdk": "^1.4.0",
+    "@adobe/aio-lib-telemetry": "^1.2.0",
+    "@adobe/exc-app": "^1.3.0",
+    "@adobe/generator-add-web-assets-exc-react": "^3.1.0",
+    "@adobe/react-spectrum": "^3.4.0",
+    "@spectrum-icons/workflow": "^3.2.0",
+    "core-js": "^3.6.4",
+    "graphql-request": "^7.4.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-error-boundary": "^1.2.5",
+    "react-router-dom": "^6.26.2",
+    "regenerator-runtime": "^0.13.5"
+  },
+  "devDependencies": {
+    "@adobe-commerce/commerce-extensibility-tools": "^3.6.0",
+    "@babel/core": "^7.8.7",
+    "@babel/plugin-transform-react-jsx": "^7.8.3",
+    "@babel/polyfill": "^7.8.7",
+    "@babel/preset-env": "^7.8.7",
+    "@biomejs/biome": "^2.5.4",
+    "@vitest/coverage-v8": "^5.0.0",
+    "ultracite": "^7.0.0",
+    "vitest": "^5.0.0"
+  },
+  "engines": {
+    "node": "^24.0.0"
+  }
+}

@@ -1,0 +1,82 @@
+[
+  {
+    "default": false,
+    "description": "Offer Klarna for new checkout eligibility and session requests.",
+    "env": [
+      "saas"
+    ],
+    "label": "Enable Klarna",
+    "name": "enabled",
+    "type": "boolean"
+  },
+  {
+    "default": "Klarna",
+    "description": "Display title for the Klarna OOPE method.",
+    "env": [
+      "saas"
+    ],
+    "label": "Title",
+    "name": "title",
+    "type": "text"
+  },
+  {
+    "default": "",
+    "description": "Optional non-sensitive checkout instructions.",
+    "env": [
+      "saas"
+    ],
+    "label": "Instructions",
+    "name": "instructions",
+    "type": "text"
+  },
+  {
+    "default": "0.00",
+    "description": "Inclusive lower cart-total bound in the Commerce order currency.",
+    "env": [
+      "saas"
+    ],
+    "label": "Minimum order total",
+    "name": "minimum_order_total",
+    "type": "text"
+  },
+  {
+    "default": "10000.00",
+    "description": "Inclusive upper cart-total bound in the Commerce order currency.",
+    "env": [
+      "saas"
+    ],
+    "label": "Maximum order total",
+    "name": "maximum_order_total",
+    "type": "text"
+  },
+  {
+    "default": "",
+    "description": "HTTPS base URL for Klarna Payments. No fixed hostname allowlist is imposed. Examples only, not permitted-value restrictions: Europe production https://api.klarna.com/; North America production https://api-na.klarna.com/; Oceania production https://api-oc.klarna.com/; Europe playground https://api.playground.klarna.com/; North America playground https://api-na.playground.klarna.com/; Oceania playground https://api-oc.playground.klarna.com/. This configured destination can receive Klarna API credentials, so manage it only through authorized Business Configuration access.",
+    "env": [
+      "saas"
+    ],
+    "label": "Klarna endpoint",
+    "name": "klarna_api_endpoint",
+    "type": "text"
+  },
+  {
+    "default": "",
+    "description": "Klarna merchant API username for authorized backend use only. Treat as credential data; never expose it in browser responses, logs, telemetry, or attempt records.",
+    "env": [
+      "saas"
+    ],
+    "label": "Klarna API username",
+    "name": "klarna_api_username",
+    "type": "text"
+  },
+  {
+    "default": "",
+    "description": "Encrypted Klarna merchant API password for authorized backend use only. Treat as server-side credential data; never expose it in browser responses, logs, telemetry, or attempt records.",
+    "env": [
+      "saas"
+    ],
+    "label": "Klarna API password",
+    "name": "klarna_api_password",
+    "type": "password"
+  }
+]

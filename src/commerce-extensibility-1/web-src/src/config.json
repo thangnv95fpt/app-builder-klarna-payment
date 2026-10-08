@@ -1,0 +1,8 @@
+{
+  "app-management/app-config": "https://localhost:9080/api/v1/web/app-management/app-config",
+  "app-management/association": "https://localhost:9080/api/v1/web/app-management/association",
+  "app-management/installation": "https://localhost:9080/api/v1/web/app-management/installation",
+  "payment-method/validate-payment": "https://localhost:9080/api/v1/web/payment-method/validate-payment",
+  "payment-method/filter-payment": "https://localhost:9080/api/v1/web/payment-method/filter-payment",
+  "klarna/create-klarna-session": "https://localhost:9080/api/v1/web/klarna/create-klarna-session"
+}

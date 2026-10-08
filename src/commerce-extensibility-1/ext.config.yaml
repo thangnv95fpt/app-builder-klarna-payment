@@ -1,0 +1,111 @@
+# The [pre-app-build] hooks are auto-generated. Do not remove or manually edit.
+hooks:
+  pre-app-build: EXTENSION=extensibility/1 npx aio-commerce-lib-app hooks pre-app-build
+
+operations:
+  # These worker processes definitions are auto-generated. Do not remove or manually edit.
+  workerProcess:
+    - type: action
+      impl: app-management/app-config
+    - type: action
+      impl: app-management/association
+    - type: action
+      impl: app-management/installation
+
+runtimeManifest:
+  packages:
+    app-management:
+      license: Apache-2.0
+      actions:
+        app-config:
+          function: .generated/actions/app-management/app-config.js
+          web: yes
+          runtime: nodejs:24
+          inputs:
+            LOG_LEVEL: $LOG_LEVEL
+          annotations:
+            final: true
+            require-adobe-auth: true
+        association:
+          function: .generated/actions/app-management/association.js
+          web: yes
+          runtime: nodejs:24
+          inputs:
+            LOG_LEVEL: $LOG_LEVEL
+          annotations:
+            final: true
+            require-adobe-auth: true
+        installation:
+          function: .generated/actions/app-management/installation.js
+          web: yes
+          runtime: nodejs:24
+          inputs:
+            LOG_LEVEL: $LOG_LEVEL
+            AIO_COMMERCE_AUTH_IMS_CLIENT_ID: $AIO_COMMERCE_AUTH_IMS_CLIENT_ID
+            AIO_COMMERCE_AUTH_IMS_CLIENT_SECRETS: $AIO_COMMERCE_AUTH_IMS_CLIENT_SECRETS
+            AIO_COMMERCE_AUTH_IMS_TECHNICAL_ACCOUNT_ID: $AIO_COMMERCE_AUTH_IMS_TECHNICAL_ACCOUNT_ID
+            AIO_COMMERCE_AUTH_IMS_TECHNICAL_ACCOUNT_EMAIL: $AIO_COMMERCE_AUTH_IMS_TECHNICAL_ACCOUNT_EMAIL
+            AIO_COMMERCE_AUTH_IMS_ORG_ID: $AIO_COMMERCE_AUTH_IMS_ORG_ID
+            AIO_COMMERCE_AUTH_IMS_SCOPES: $AIO_COMMERCE_AUTH_IMS_SCOPES
+            AIO_COMMERCE_CONFIG_ENCRYPTION_KEY: $AIO_COMMERCE_CONFIG_ENCRYPTION_KEY
+          annotations:
+            final: true
+            require-adobe-auth: true
+          limits:
+            timeout: 600000
+    payment-method:
+      license: Apache-2.0
+      actions:
+        # https://developer.adobe.com/commerce/extensibility/starter-kit/checkout/payment-use-cases/
+        validate-payment:
+          function: actions/validate-payment/index.js
+          web: 'yes'
+          runtime: nodejs:24
+          inputs:
+            LOG_LEVEL: $LOG_LEVEL
+            ENABLE_TELEMETRY: true
+          annotations:
+            require-adobe-auth: true
+            final: true
+        filter-payment:
+          function: actions/filter-payment/index.js
+          web: 'yes'
+          runtime: nodejs:24
+          inputs:
+            LOG_LEVEL: $LOG_LEVEL
+            ENABLE_TELEMETRY: true
+          annotations:
+            require-adobe-auth: true
+            final: true
+    klarna:
+      license: Apache-2.0
+      actions:
+        # Creates a Klarna Payments session for a Magento guest cart (input: maskCartID).
+        # Not behind Adobe auth so the storefront can call it; the mask cart ID is the only credential.
+        # Commerce is called with the IMS (PaaS) technical account through @adobe/aio-commerce-lib-api.
+        create-klarna-session:
+          function: actions/create-klarna-session/index.js
+          web: 'yes'
+          runtime: nodejs:24
+          inputs:
+            LOG_LEVEL: $LOG_LEVEL
+            ENABLE_TELEMETRY: true
+            AIO_COMMERCE_API_BASE_URL: $AIO_COMMERCE_API_BASE_URL
+            AIO_COMMERCE_AUTH_IMS_CLIENT_ID: $AIO_COMMERCE_AUTH_IMS_CLIENT_ID
+            AIO_COMMERCE_AUTH_IMS_CLIENT_SECRETS: $AIO_COMMERCE_AUTH_IMS_CLIENT_SECRETS
+            AIO_COMMERCE_AUTH_IMS_TECHNICAL_ACCOUNT_ID: $AIO_COMMERCE_AUTH_IMS_TECHNICAL_ACCOUNT_ID
+            AIO_COMMERCE_AUTH_IMS_TECHNICAL_ACCOUNT_EMAIL: $AIO_COMMERCE_AUTH_IMS_TECHNICAL_ACCOUNT_EMAIL
+            AIO_COMMERCE_AUTH_IMS_ORG_ID: $AIO_COMMERCE_AUTH_IMS_ORG_ID
+            AIO_COMMERCE_AUTH_IMS_SCOPES: $AIO_COMMERCE_AUTH_IMS_SCOPES
+            STOREFRONT_URL: $STOREFRONT_URL
+            DEFAULT_COUNTRY: $DEFAULT_COUNTRY
+            KLARNA_MERCHANT_ID: $KLARNA_MERCHANT_ID
+            KLARNA_SHARED_SECRET: $KLARNA_SHARED_SECRET
+            KLARNA_REGION: $KLARNA_REGION
+            KLARNA_TEST_MODE: $KLARNA_TEST_MODE
+            KLARNA_B2B_ENABLED: $KLARNA_B2B_ENABLED
+            KLARNA_DATA_SHARING_ENABLED: $KLARNA_DATA_SHARING_ENABLED
+            KLARNA_OPTIONS: $KLARNA_OPTIONS
+          annotations:
+            require-adobe-auth: false
+            final: true
