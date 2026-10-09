@@ -178,6 +178,9 @@ export function generateCreateSessionRequest({ cart, totals, config }) {
     order_tax_amount: computeOrderTaxAmount(orderLines),
     purchase_country: purchaseCountry,
     purchase_currency: cart.currency?.base_currency_code,
+    merchant_urls: {
+      authorization: config.merchantUrls?.authorization || "",
+    }
   };
 
   if (config.options) {

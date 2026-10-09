@@ -9,13 +9,14 @@ import {
 import { GraphQLClient } from "graphql-request";
 
 import { telemetryConfig } from "../telemetry.js";
-import { CartNotFoundError, fetchCart } from "../commerce/cart.js";
+import { CartNotFoundError, fetchCart, setPaymentMethodOnCart } from "../commerce/cart.js";
 import {
   generateCreateSessionRequest,
   KlarnaRequestError,
 } from "../klarna/request.js";
 
 import { createKlarnaSession } from "../klarna/client.js";
+import { KlarnaDb } from "../klarna/db.js";
 const MASK_CART_ID_PATTERN = /^[A-Za-z0-9]+$/;
 
 
@@ -81,7 +82,7 @@ async function createKlarnaSessionAction(params) {
 
     // Klarna calls the authorization URL with this token, Magento has to know it for the quote to validate it.
     const authCallbackToken =
-      params.authCallbackToken || randomBytes(16).toString("hex");
+      params.authCallbackToken || maskCartID + '_' + randomBytes(32).toString("hex");
 
     const request = generateCreateSessionRequest({
       cart,
@@ -95,19 +96,25 @@ async function createKlarnaSessionAction(params) {
           : undefined,
         prefillEnabled: isTrue(params.KLARNA_DATA_SHARING_ENABLED),
         storefrontUrl: trimTrailingSlash(params.STOREFRONT_URL),
+        merchantUrls: {
+          authorization: `https://webhook.site/7248e404-a998-4b0f-b4f0-fead3c1b54b6?token=${authCallbackToken}`,
+        },
       },
       totals,
     });
 
     const session = await createKlarnaSession(params, request);
     logger.info(`Klarna session ${session.session_id} created`);
-
-    return response(200, {
-      authCallbackToken,
+    const klarnaQuoteData = {
+      authCallbackToken: authCallbackToken,
+      sessionId: session.session_id,
       clientToken: session.client_token,
       paymentMethodCategories: session.payment_method_categories ?? [],
-      sessionId: session.session_id,
-    });
+    }
+    const db = await KlarnaDb.fromParams(params);
+    await db.upsertQuote(maskCartID, klarnaQuoteData);
+    await db.close();
+    return response(200, klarnaQuoteData);  
   } catch (error) {
     logger.error(
       "Error creating the Klarna session:",

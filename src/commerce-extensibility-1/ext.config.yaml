@@ -99,6 +99,7 @@ runtimeManifest:
             AIO_COMMERCE_AUTH_IMS_SCOPES: $AIO_COMMERCE_AUTH_IMS_SCOPES
             STOREFRONT_URL: $STOREFRONT_URL
             DEFAULT_COUNTRY: $DEFAULT_COUNTRY
+            DB_REGION: $AIO_DB_REGION
             KLARNA_MERCHANT_ID: $KLARNA_MERCHANT_ID
             KLARNA_SHARED_SECRET: $KLARNA_SHARED_SECRET
             KLARNA_REGION: $KLARNA_REGION
@@ -108,4 +109,29 @@ runtimeManifest:
             KLARNA_OPTIONS: $KLARNA_OPTIONS
           annotations:
             require-adobe-auth: false
+            include-ims-credentials: true
+            final: true
+        authorize:
+          function: actions/authorize/index.js
+          web: 'yes'
+          runtime: nodejs:24
+          inputs:
+            LOG_LEVEL: $LOG_LEVEL
+            ENABLE_TELEMETRY: true
+            DB_REGION: $AIO_DB_REGION
+          annotations:
+            require-adobe-auth: false
+            include-ims-credentials: true
+            final: true
+        quote-status:
+          function: actions/quote-status/index.js
+          web: 'yes'
+          runtime: nodejs:24
+          inputs:
+            LOG_LEVEL: $LOG_LEVEL
+            ENABLE_TELEMETRY: true
+            DB_REGION: $AIO_DB_REGION
+          annotations:
+            require-adobe-auth: false
+            include-ims-credentials: true
             final: true

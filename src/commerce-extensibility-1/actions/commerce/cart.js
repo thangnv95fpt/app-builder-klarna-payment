@@ -177,7 +177,7 @@ function getGraphqlErrors(error) {
  * @returns {Promise<{cart: object, totals: object}>}
  * @throws {CartNotFoundError} when Commerce does not know the cart
  */
-export async function fetchCart(graphqlClient, maskCartID, storeCode) {
+export async function fetchCart(graphqlClient, maskCartID, storeCode, convertToKlarnaCart = true) {
   let data;
   try {
     data = await graphqlClient.request(
@@ -202,8 +202,9 @@ export async function fetchCart(graphqlClient, maskCartID, storeCode) {
     throw new CartNotFoundError("Cart not found");
   }
 
-  return toKlarnaCart(data.cart);
+  return convertToKlarnaCart ? toKlarnaCart(data.cart) : { cart: data.cart};
 }
+
 
 export async function setPaymentMethodOnCart(graphqlClient, maskCartID, paymentMethod, storeCode) {
   const mutation = `
@@ -235,3 +236,95 @@ export async function setPaymentMethodOnCart(graphqlClient, maskCartID, paymentM
     throw error;
   }
 }
+
+/**
+ * Sets custom attributes on the cart, keeping the ones already on it.
+ *
+ * The mutation replaces the attributes it is given, so the current ones are read first and merged with
+ * `customAttributes` (an entry with an existing `attribute_code` overrides the current value).
+ *
+ * @see https://developer.adobe.com/commerce/webapi/reference/graphql/saas/mutations#setcustomattributesoncart
+ * @param {import("graphql-request").GraphQLClient} graphqlClient client targeting the Commerce GraphQL endpoint
+ * @param {string} maskCartID the masked ID of the cart
+ * @param {{attribute_code: string, value: string}[]} customAttributes the `CustomAttributeInput` entries to set
+ * @param {string} [storeCode] store view code, sent as the `Store` header
+ * @throws {CartNotFoundError} when Commerce does not know the cart
+ */
+export async function setCustomAttributesOnCart(graphqlClient, maskCartID, customAttributes, storeCode) {
+  const query = `
+    query GetCartCustomAttributes($maskCartID: String!) {
+      cart(cart_id: $maskCartID) {
+        custom_attributes { attribute_code value }
+      }
+    }
+  `;
+  const mutation = `
+    mutation SetCustomAttributesOnCart($input: CartCustomAttributesInput!) {
+      setCustomAttributesOnCart(input: $input) {
+        cart {
+          id
+        }
+      }
+    }
+  `;
+  const headers = storeCode ? { Store: storeCode } : undefined;
+
+  try {
+    const data = await graphqlClient.request(query, { maskCartID }, headers);
+    if (!data?.cart) {
+      throw new CartNotFoundError("Cart not found");
+    }
+
+    const merged = new Map(
+      (data.cart.custom_attributes ?? []).map(({ attribute_code, value }) => [
+        attribute_code,
+        { attribute_code, value },
+      ]),
+    );
+    for (const { attribute_code, value } of customAttributes) {
+      merged.set(attribute_code, { attribute_code, value });
+    }
+
+    await graphqlClient.request(
+      mutation,
+      { input: { cart_id: maskCartID, custom_attributes: [...merged.values()] } },
+      headers,
+    );
+  } catch (error) {
+    const errors = getGraphqlErrors(error);
+    if (
+      errors.some(
+        (graphqlError) =>
+          graphqlError.extensions?.category === "graphql-no-such-entity",
+      )
+    ) {
+      throw new CartNotFoundError(errors[0].message, { cause: error });
+    }
+    throw error;
+  }
+}
+
+/** Places the order of the (guest) cart. Returns the order number. */
+export async function placeOrder(graphqlClient, maskCartID, storeCode) {
+  const mutation = `
+    mutation PlaceOrder($maskCartID: String!) {
+      placeOrder(input: { cart_id: $maskCartID }) {
+        errors { code message }
+        orderV2 { number }
+      }
+    }
+  `;
+
+  const data = await graphqlClient.request(
+    mutation,
+    { maskCartID },
+    storeCode ? { Store: storeCode } : undefined,
+  );
+  const { errors, orderV2 } = data.placeOrder;
+  if (errors?.length) {
+    throw new PlaceOrderError(errors.map((error) => error.message).join("; "));
+  }
+  return orderV2?.number;
+}
+
+export class PlaceOrderError extends Error {}
